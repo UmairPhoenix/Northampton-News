@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $stmt = $pdo->prepare('INSERT INTO users (username, email, password) VALUES (:username, :email, :password)');
     try {
-        $stmt->execute(['username' => $username, 'email' => $email, 'password' => $password]);
+        $stmt->execute(['username' => $username, 'email' => $email, 'password' => $password, 'role' => 'user']);
         echo '<p class="success">Registration successful! <a href="login.php">Log in</a></p>';
     } catch (PDOException $e) {
         echo '<p class="error">Error: ' . htmlspecialchars($e->getMessage()) . '</p>';

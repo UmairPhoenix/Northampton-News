@@ -6,7 +6,7 @@ $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_staff'])) {
     $username = trim($_POST['username']);
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $password = $_POST['password'];
     $role = 'admin';
 
     if (!empty($username) && !empty($_POST['password'])) {

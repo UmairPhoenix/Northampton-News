@@ -18,7 +18,7 @@
             $stmt = $pdo->prepare('SELECT * FROM staff WHERE username = :username AND password = :password');
             $stmt->execute([
                 'username' => $_POST['username'],
-                'password' => hash('sha256', $_POST['password'])
+                'password' => $_POST['password'],
             ]);
             $user = $stmt->fetch();
 

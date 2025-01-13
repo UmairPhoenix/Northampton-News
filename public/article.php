@@ -18,21 +18,25 @@ if (!$article) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_SESSION['user_id']) && isset($_SESSION['role']) && $_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'superadmin') {
+    if (isset($_SESSION['user_id']) && isset($_SESSION['role']) == 'user') {
         $userId = $_SESSION['user_id'];
-        $comment = $_POST['comment'];
+        $comment = trim($_POST['comment']);
 
         if (!empty($comment)) {
             $stmt = $pdo->prepare('
                 INSERT INTO comments (article_id, user_id, comment, date) 
                 VALUES (:article_id, :user_id, :comment, NOW())
             ');
-            $stmt->execute([
-                'article_id' => $articleId,
-                'user_id' => $userId,
-                'comment' => $comment,
-            ]);
-            echo '<p class="success">Comment added successfully!</p>';
+            try {
+                $stmt->execute([
+                    'article_id' => $articleId,
+                    'user_id' => $userId,
+                    'comment' => $comment,
+                ]);
+                echo '<p class="success">Comment added successfully!</p>';
+            } catch (PDOException $e) {
+                echo '<p class="error">Failed to add comment: ' . htmlspecialchars($e->getMessage()) . '</p>';
+            }
         } else {
             echo '<p class="error">Comment cannot be empty.</p>';
         }
