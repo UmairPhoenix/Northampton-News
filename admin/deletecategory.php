@@ -1,73 +1,36 @@
-<?php 
-session_start();
+<?php
+	include 'includes/header.php';
+	include 'includes/navbar.php';
+
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header('Location: index.php');
+    exit;
+}
+
+if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+    try {
+        // Prepare and execute the delete query
+        $stmt = $pdo->prepare('DELETE FROM category WHERE id = :id');
+        $stmt->execute(['id' => $_GET['id']]);
+
+        // Display a success message
+        echo '<p class="success">Category deleted successfully.</p>';
+    } catch (PDOException $e) {
+        // Display an error message
+        echo '<p class="error">Error deleting category: ' . htmlspecialchars($e->getMessage()) . '</p>';
+    }
+} else {
+    echo '<p class="error">Invalid category ID.</p>';
+}
+
+echo '<p><a href="categories.php">Back to Categories</a></p>';
 ?>
-<!DOCTYPE html>
-<html>
-	<head>
-		<link rel="stylesheet" href="/styles.css"/>
-        <meta name="summary" content="Assignment 2024" />
-		<title>Northampton News - Home</title>
-	</head>
-	<body>
-		<header>
-			<section>
-				<h1>Northampton News</h1>
-			</section>
-		</header>
-		<nav>
-			<ul>
-				<li><a href="/">Home</a></li>
-				<li><a href="/latest.php">Latest Articles</a></li>
-				<li><a href="#">Select Category</a>
-					<ul>
-						<li><a href="news.php">Local News</a></li>
-						<li><a href="events.php">Local Events</a></li>
-						<li><a href="sport.php">Sport</a></li>
-					</ul>
-				</li>
-				<li><a href="contact.php">Contact us</a></li>
-			</ul>
-		</nav>
-		<img src="/images/banners/randombanner.php" />
-		<main>
-        	<nav>
-				<ul>
-					<li><a href="addcategory.php">Add Category</a></li>
-					<li><a href="addarticle.php">Add Article</a></li>
-					<li><a href="categories.php">List Categories</a></li>
-					<li><a href="articles.php">List Articles</a></li>
-				</ul>
-            </nav>
-            <article>
-                <h2>Add Article</h2>
 
-                <?php
+<main>
+    <article>
+        <h2>Delete Category</h2>
+        <p>Use the "Back to Categories" link above to manage other categories.</p>
+    </article>
+</main>
 
-                if (isset($_SESSION['loggedin'])) {
-                    $pdo = new PDO('mysql:host=mysql;dbname=news;charset=utf8', 'student', 'student');
-                    $stmt = $pdo->prepare('DELETE FROM category WHERE id = :id');
-                    $stmt->execute(['id' => $_GET['id']]);
-
-                    echo 'Category deleted';
-                }
-                else {
-                    ?>
-                    <form action="index.php" method="POST">
-                       <label>Username</label>                                              
-                       <input type="text" name="username" /> 
-                       <label>Password</label>
-                       <input type="password" name="password" />
-                       <input type="submit" name="submit" value="submit" />
-                    </form>
-                    <?php   
-                }
-                ?>
-            </article>
-
-        </main>
-
-		<footer>
-			&copy; Northampton News 2020
-		</footer>
-	</body>
-</html>
+<?php include 'includes/footer.php'; ?>

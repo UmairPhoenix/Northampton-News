@@ -1,81 +1,51 @@
-<?php 
-session_start();
+<?php
+	include 'includes/header.php';
+	include 'includes/navbar.php';
 ?>
-<!DOCTYPE html>
-<html>
-	<head>
-		<link rel="stylesheet" href="/styles.css"/>
-        <meta name="summary" content="Assignment 2024" />
-		<title>Northampton News - Home</title>
-	</head>
-	<body>
-		<header>
-			<section>
-				<h1>Northampton News</h1>
-			</section>
-		</header>
-		<nav>
-			<ul>
-				<li><a href="/">Home</a></li>
-				<li><a href="latest.php">Latest Articles</a></li>
-				<li><a href="#">Select Category</a>
-					<ul>
-						<li><a href="news.php">Local News</a></li>
-						<li><a href="events.php">Local Events</a></li>
-						<li><a href="sport.php">Sport</a></li>
-					</ul>
-				</li>
-				<li><a href="contact.php">Contact us</a></li>
-			</ul>
-		</nav>
-		<img src="/images/banners/randombanner.php" />
-		<main>
-        	<nav>
-				<ul>
-					<li><a href="addcategory.php">Add Category</a></li>
-					<li><a href="addarticle.php">Add Article</a></li>
-					<li><a href="categories.php">List Categories</a></li>
-					<li><a href="articles.php">List Articles</a></li>
-				</ul>
-            </nav>
-            <article>
-                <h2>Add category</h2>
-                <?php
 
-                if (isset($_SESSION['loggedin'])) {
-                    $pdo = new PDO('mysql:host=mysql;dbname=news;charset=utf8', 'student', 'student');
-                        
-                    $stmt = $pdo->prepare('SELECT * FROM category');
-                    $stmt->execute();
+<main>
+    <nav>
+        <ul>
+            <li><a href="addcategory.php">Add Category</a></li>
+            <li><a href="addarticle.php">Add Article</a></li>
+            <li><a href="categories.php">List Categories</a></li>
+            <li><a href="articles.php">List Articles</a></li>
+        </ul>
+    </nav>
+    <article>
+        <h2>Categories</h2>
+        <?php
+        if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
+            try {
+                $stmt = $pdo->query('SELECT * FROM category ORDER BY id ASC');
 
-                    echo '<table>';
-                    foreach ($stmt as $category) {
-                        echo '<tr>';
-                        echo '<td>' . $category['name'] . '</td>';
-                        echo '<td><a href="editcategory.php?id=' . $category['id'] . '">Edit</a></td>';
-                        echo '<td><a href="deletecategory.php?id=' . $category['id'] . '">Delete</a></td>';
-                        echo '</td>';
-                    }
-                    echo '</table>';
+                echo '<table>';
+                echo '<thead>';
+                echo '<tr>';
+                echo '<th>Category Name</th>';
+                echo '<th>Actions</th>';
+                echo '</tr>';
+                echo '</thead>';
+                echo '<tbody>';
+                foreach ($stmt as $category) {
+                    echo '<tr>';
+                    echo '<td>' . htmlspecialchars($category['name']) . '</td>';
+                    echo '<td>';
+                    echo '<a href="editcategory.php?id=' . htmlspecialchars($category['id']) . '">Edit</a> | ';
+                    echo '<a href="deletecategory.php?id=' . htmlspecialchars($category['id']) . '" onclick="return confirm(\'Are you sure you want to delete this category?\');">Delete</a>';
+                    echo '</td>';
+                    echo '</tr>';
                 }
-                else {
-                    ?>
-                    <form action="index.php" method="POST">
-                       <label>Username</label>                                              
-                       <input type="text" name="username" /> 
-                       <label>Password</label>
-                       <input type="password" name="password" />
-                       <input type="submit" name="submit" value="submit" />
-                    </form>
-                    <?php   
-                }
-                ?>
-            </article>
+                echo '</tbody>';
+                echo '</table>';
+            } catch (PDOException $e) {
+                echo '<p class="error">Error fetching categories: ' . htmlspecialchars($e->getMessage()) . '</p>';
+            }
+        } else {
+            echo '<p class="error">You must be logged in to view this page.</p>';
+        }
+        ?>
+    </article>
+</main>
 
-        </main>
-
-		<footer>
-			&copy; Northampton News 2020
-		</footer>
-	</body>
-</html>
+<?php include 'includes/footer.php'; ?>
