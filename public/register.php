@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
-    $stmt = $pdo->prepare('INSERT INTO users (username, email, password) VALUES (:username, :email, :password)');
+    $stmt = $pdo->prepare('INSERT INTO users (username, email, password, role) VALUES (:username, :email, :password, :role)');
     try {
         $stmt->execute(['username' => $username, 'email' => $email, 'password' => $password, 'role' => 'user']);
         echo '<p class="success">Registration successful! <a href="login.php">Log in</a></p>';
