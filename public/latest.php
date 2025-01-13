@@ -13,15 +13,19 @@
     <article>
         <?php
         try {
-            $stmt = $pdo->query('SELECT * FROM article ORDER BY date DESC');
+            $stmt = $pdo->prepare('
+                SELECT article.*, staff.username AS author 
+                FROM article 
+                JOIN staff ON article.author_id = staff.id
+                ORDER BY article.date DESC
+            ');
+            $stmt->execute();
             $articles = $stmt->fetchAll();
-
-            echo '<h2>Latest Articles</h2>';
 
             foreach ($articles as $article) {
                 echo '<hr />';
-                echo '<h2>' . htmlspecialchars($article['title']) . '</h2>';
-                echo '<em>' . htmlspecialchars($article['date']) . '</em>';
+                echo '<h3>' . htmlspecialchars($article['title']) . '</h3>';
+                echo '<em>By <a href="author.php?id=' . $article['author_id'] . '">' . htmlspecialchars($article['author']) . '</a> on ' . htmlspecialchars($article['date']) . '</em>';
                 echo '<p>' . htmlspecialchars($article['description']) . '</p>';
             }
         } catch (PDOException $e) {
